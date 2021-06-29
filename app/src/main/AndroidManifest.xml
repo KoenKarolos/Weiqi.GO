@@ -12,6 +12,10 @@
         <activity
             android:name=".MainActivity"
             android:label="@string/title_activity_main">
+        </activity>
+        <activity
+            android:name=".local.play_local"
+            android:label="Play Locally!">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -19,16 +23,11 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".local.play_local"
-            android:label="Play Locally!">
-        </activity>
-        <activity
             android:name=".online.play_online"
             android:label="Play Online!">
         </activity>
         <activity
             android:name=".rules.rules"
-            android:parentActivityName=".MainActivity"
             android:label="Show Rules">
         </activity>
         <activity
