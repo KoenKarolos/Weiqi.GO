@@ -18,19 +18,21 @@ import androidx.core.content.ContextCompat;
 import static android.content.ContentValues.TAG;
 
 public class GoBoardView extends View  {
-
+    float x,y;
+    boolean touched = false;
     private int counter = 0;
     int teal = ContextCompat.getColor(getContext(), R.color.teal_700);
-
+    private Paint paint;
     private Bitmap whiteStoneBitmap = BitmapFactory.decodeResource(getContext().getResources() ,R.drawable.white_stone);
-    private Paint paint = new Paint();
+
 
     public GoBoardView(Context context, @Nullable AttributeSet attrs) {
-        super(context, attrs);
+        super(context,attrs);
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
+        paint=new Paint();
         paint.setColor(Color.LTGRAY);
 
         float width = getWidth();
@@ -39,10 +41,10 @@ public class GoBoardView extends View  {
         float cell_9 = width/9;
 
         Rect singleCell = new Rect(
-                0,
-                (int)init_height,
-                (int)cell_9,
-                (int)(init_height+cell_9));
+                (int)(x-cell_9/2),
+                (int)(y-cell_9/2),
+                (int)(x+cell_9/2),
+                (int)(y+cell_9/2));
 
         for(int column=0;column<9;column++){
             for(int row=0;row<9;row++){
@@ -59,19 +61,27 @@ public class GoBoardView extends View  {
 
             }
         }
-        canvas.drawBitmap(whiteStoneBitmap, null, singleCell, paint);
+        if(touched){
+            canvas.drawBitmap(whiteStoneBitmap, null, singleCell, paint);
+        }
+
         super.onDraw(canvas);
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        touched = true;
+        x=event.getX();
+        y=event.getY();
+
         switch (event.getAction()){
             case MotionEvent.ACTION_DOWN:
-                float x=event.getX();
-                float y=event.getY();
                 Log.d(TAG,"click " + counter);
                 counter += 1;
         }
+        invalidate();
+
         return true;
     }
+
 }
