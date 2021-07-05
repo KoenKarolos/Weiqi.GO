@@ -15,12 +15,20 @@ import android.view.View;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import static android.content.ContentValues.TAG;
 
 public class GoBoardView extends View  {
+
+    Map<Integer, List<Integer>> moves = new HashMap<>();
+
     float x,y;
     boolean touched = false;
-    private int counter = 0;
+    private int turn = 1;
     int teal = ContextCompat.getColor(getContext(), R.color.teal_700);
     private Paint paint;
     private Bitmap whiteStoneBitmap = BitmapFactory.decodeResource(getContext().getResources() ,R.drawable.white_stone);
@@ -40,12 +48,6 @@ public class GoBoardView extends View  {
         float init_height = height/5;
         float cell_9 = width/9;
 
-        Rect singleCell = new Rect(
-                (int)(x-cell_9/2),
-                (int)(y-cell_9/2),
-                (int)(x+cell_9/2),
-                (int)(y+cell_9/2));
-
         for(int column=0;column<9;column++){
             for(int row=0;row<9;row++){
                 if (column%2 == 1 && row%2 == 0 || column%2 == 0 && row%2 ==1){
@@ -61,8 +63,16 @@ public class GoBoardView extends View  {
 
             }
         }
-        if(touched){
-            canvas.drawBitmap(whiteStoneBitmap, null, singleCell, paint);
+
+        for(Integer key : moves.keySet()) {
+            x = moves.get(key).get(0);
+            y = moves.get(key).get(1);
+            Rect BoardPosition = new Rect(
+                    (int) (x - cell_9 / 2),
+                    (int) (y - cell_9 / 2),
+                    (int) (x + cell_9 / 2),
+                    (int) (y + cell_9 / 2));
+            canvas.drawBitmap(whiteStoneBitmap, null, BoardPosition, paint);
         }
 
         super.onDraw(canvas);
@@ -70,16 +80,27 @@ public class GoBoardView extends View  {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        touched = true;
         x=event.getX();
         y=event.getY();
+        List<Integer> k = new ArrayList<>();
 
         switch (event.getAction()){
             case MotionEvent.ACTION_DOWN:
-                Log.d(TAG,"click " + counter);
-                counter += 1;
+                if(turn%2 == 0){
+                    Log.d(TAG,"Turn Nr. " + turn + ": WHITE moved to x= " + x +" y= "+ y);
+                }else{
+                    Log.d(TAG,"Turn Nr. " + turn + ": BLACK moved to x= " + x +" y= "+ y);
+                }
+                break;
         }
-        invalidate();
+
+        k.add((int) x);
+        k.add((int) y);
+        moves.put(turn,k);
+        Log.d(TAG, String.valueOf(moves.keySet()));
+        turn += 1;
+
+        invalidate(); //redraws canvas
 
         return true;
     }
