@@ -32,7 +32,7 @@ public class GoBoardView extends View  {
     int teal = ContextCompat.getColor(getContext(), R.color.teal_700);
     private Paint paint;
     private Bitmap whiteStoneBitmap = BitmapFactory.decodeResource(getContext().getResources() ,R.drawable.white_stone);
-
+    private Bitmap blackStoneBitmap = BitmapFactory.decodeResource(getContext().getResources() ,R.drawable.black_stone);
 
     public GoBoardView(Context context, @Nullable AttributeSet attrs) {
         super(context,attrs);
@@ -46,7 +46,7 @@ public class GoBoardView extends View  {
         float width = getWidth();
         float height = getHeight();
         float init_height = height/5;
-        float cell_9 = width/9;
+        float cell = width/9;
 
         for(int column=0;column<9;column++){
             for(int row=0;row<9;row++){
@@ -56,10 +56,10 @@ public class GoBoardView extends View  {
                     paint.setColor(Color.LTGRAY);
                 }
                 canvas.drawRect(
-                        cell_9*column,
-                        init_height+cell_9*row,
-                        cell_9*(column+1),
-                        init_height+cell_9*(row+1),paint);
+                        cell*column,
+                        init_height+cell*row,
+                        cell*(column+1),
+                        init_height+cell*(row+1),paint);
 
             }
         }
@@ -68,11 +68,15 @@ public class GoBoardView extends View  {
             x = moves.get(key).get(0);
             y = moves.get(key).get(1);
             Rect BoardPosition = new Rect(
-                    (int) (x - cell_9 / 2),
-                    (int) (y - cell_9 / 2),
-                    (int) (x + cell_9 / 2),
-                    (int) (y + cell_9 / 2));
-            canvas.drawBitmap(whiteStoneBitmap, null, BoardPosition, paint);
+                    (int) (x - cell / 2),
+                    (int) (y - cell / 2),
+                    (int) (x + cell / 2),
+                    (int) (y + cell / 2));
+            if(key%2 == 0){
+                canvas.drawBitmap(whiteStoneBitmap, null, BoardPosition, paint);
+            }else{
+                canvas.drawBitmap(blackStoneBitmap, null, BoardPosition, paint);
+            }
         }
 
         super.onDraw(canvas);
@@ -91,15 +95,12 @@ public class GoBoardView extends View  {
                 }else{
                     Log.d(TAG,"Turn Nr. " + turn + ": BLACK moved to x= " + x +" y= "+ y);
                 }
-                break;
+                k.add((int) x);
+                k.add((int) y);
+                moves.put(turn,k);
+                Log.d(TAG, String.valueOf(moves.keySet()));
+                turn += 1;
         }
-
-        k.add((int) x);
-        k.add((int) y);
-        moves.put(turn,k);
-        Log.d(TAG, String.valueOf(moves.keySet()));
-        turn += 1;
-
         invalidate(); //redraws canvas
 
         return true;
