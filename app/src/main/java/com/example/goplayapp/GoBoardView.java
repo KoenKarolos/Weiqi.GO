@@ -24,32 +24,62 @@ import static android.content.ContentValues.TAG;
 
 public class GoBoardView extends View  {
 
-    Map<Integer, List<Integer>> moves = new HashMap<>();
+    Map<Integer, List<Integer>> moves = new HashMap<>(); // Dictionary {turn : [posX,posY]}
 
-    float x,y;
-    boolean touched = false;
+    float posX,posY;
     private int turn = 1;
     int teal = ContextCompat.getColor(getContext(), R.color.teal_700);
     private Paint paint;
     private Bitmap whiteStoneBitmap = BitmapFactory.decodeResource(getContext().getResources() ,R.drawable.white_stone);
     private Bitmap blackStoneBitmap = BitmapFactory.decodeResource(getContext().getResources() ,R.drawable.black_stone);
 
-    public GoBoardView(Context context, @Nullable AttributeSet attrs) {
-        super(context,attrs);
-    }
+    public GoBoardView(Context context, @Nullable AttributeSet attrs) { super(context,attrs);}
 
     @Override
     protected void onDraw(Canvas canvas) {
         paint=new Paint();
-        paint.setColor(Color.LTGRAY);
+        drawBoard(canvas, 9);
+        super.onDraw(canvas);
+    }
 
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        posX=event.getX();
+        posY=event.getY();
+        List<Integer> k = new ArrayList<>();
+
+        switch (event.getAction()){
+            case MotionEvent.ACTION_UP:
+                if(turn%2 == 0){
+                    Log.d(TAG,"Turn Nr. " + turn + ": WHITE moved to x= " + posX +" y= "+ posY);
+                }else{
+                    Log.d(TAG,"Turn Nr. " + turn + ": BLACK moved to x= " + posX +" y= "+ posY);
+                }
+                k.add((int) posX);
+                k.add((int) posY);
+                moves.put(turn,k);
+                Log.d(TAG, String.valueOf(moves.keySet()));
+                turn += 1;
+                break;
+
+            case MotionEvent.ACTION_DOWN:
+                //to do ghost move
+                break;
+        }
+        invalidate(); //redraws canvas
+
+        return true;
+    }
+
+    private void drawBoard(Canvas canvas, int size){
         float width = getWidth();
         float height = getHeight();
         float init_height = height/5;
-        float cell = width/9;
+        float cell = width/size;
 
-        for(int column=0;column<9;column++){
-            for(int row=0;row<9;row++){
+        //Drawing Grid
+        for(int column=0;column<size;column++){ // draws 9x9 board
+            for(int row=0;row<size;row++){
                 if (column%2 == 1 && row%2 == 0 || column%2 == 0 && row%2 ==1){
                     paint.setColor(teal);
                 }else{
@@ -64,46 +94,34 @@ public class GoBoardView extends View  {
             }
         }
 
+        //Drawing actual Board
+        paint.setColor(Color.BLACK);
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(10);
+        for(int column=0;column<size-1;column++){ // draws 9x9 board
+            for(int row=0;row<size-1;row++){
+                canvas.drawRect(
+                        cell*column+cell/2,
+                        init_height+cell*row+cell/2,
+                        cell*(column+1)+cell/2,
+                        init_height+cell*(row+1)+cell/2,paint);
+            }
+        }
+
+        //drawing stones/moves
         for(Integer key : moves.keySet()) {
-            x = moves.get(key).get(0);
-            y = moves.get(key).get(1);
+            posX = moves.get(key).get(0);
+            posY = moves.get(key).get(1);
             Rect BoardPosition = new Rect(
-                    (int) (x - cell / 2),
-                    (int) (y - cell / 2),
-                    (int) (x + cell / 2),
-                    (int) (y + cell / 2));
+                    (int) (posX - cell / 2),
+                    (int) (posY - cell / 2),
+                    (int) (posX + cell / 2),
+                    (int) (posY + cell / 2));
             if(key%2 == 0){
                 canvas.drawBitmap(whiteStoneBitmap, null, BoardPosition, paint);
             }else{
                 canvas.drawBitmap(blackStoneBitmap, null, BoardPosition, paint);
             }
         }
-
-        super.onDraw(canvas);
     }
-
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        x=event.getX();
-        y=event.getY();
-        List<Integer> k = new ArrayList<>();
-
-        switch (event.getAction()){
-            case MotionEvent.ACTION_DOWN:
-                if(turn%2 == 0){
-                    Log.d(TAG,"Turn Nr. " + turn + ": WHITE moved to x= " + x +" y= "+ y);
-                }else{
-                    Log.d(TAG,"Turn Nr. " + turn + ": BLACK moved to x= " + x +" y= "+ y);
-                }
-                k.add((int) x);
-                k.add((int) y);
-                moves.put(turn,k);
-                Log.d(TAG, String.valueOf(moves.keySet()));
-                turn += 1;
-        }
-        invalidate(); //redraws canvas
-
-        return true;
-    }
-
 }
