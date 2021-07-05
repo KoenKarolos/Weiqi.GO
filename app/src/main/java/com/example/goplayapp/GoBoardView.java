@@ -1,9 +1,12 @@
 package com.example.goplayapp;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -17,8 +20,10 @@ import static android.content.ContentValues.TAG;
 public class GoBoardView extends View  {
 
     private int counter = 0;
-    private Paint paint;
     int teal = ContextCompat.getColor(getContext(), R.color.teal_700);
+
+    private Bitmap whiteStoneBitmap = BitmapFactory.decodeResource(getContext().getResources() ,R.drawable.white_stone);
+    private Paint paint = new Paint();
 
     public GoBoardView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -26,13 +31,18 @@ public class GoBoardView extends View  {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        paint = new Paint();
         paint.setColor(Color.LTGRAY);
 
         float width = getWidth();
         float height = getHeight();
         float init_height = height/5;
         float cell_9 = width/9;
+
+        Rect singleCell = new Rect(
+                0,
+                (int)init_height,
+                (int)cell_9,
+                (int)(init_height+cell_9));
 
         for(int column=0;column<9;column++){
             for(int row=0;row<9;row++){
@@ -49,6 +59,7 @@ public class GoBoardView extends View  {
 
             }
         }
+        canvas.drawBitmap(whiteStoneBitmap, null, singleCell, paint);
         super.onDraw(canvas);
     }
 
@@ -56,7 +67,8 @@ public class GoBoardView extends View  {
     public boolean onTouchEvent(MotionEvent event) {
         switch (event.getAction()){
             case MotionEvent.ACTION_DOWN:
-                paint.setColor(Color.BLACK);
+                float x=event.getX();
+                float y=event.getY();
                 Log.d(TAG,"click " + counter);
                 counter += 1;
         }
