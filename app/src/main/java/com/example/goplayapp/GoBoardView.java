@@ -29,6 +29,7 @@ public class GoBoardView extends View  {
 
     float posX,posY;
     private int turn = 1;
+
     int brown = ContextCompat.getColor(getContext(), R.color.brown);
     int gray = ContextCompat.getColor(getContext(), R.color.darkgray);
     private Paint paint;
@@ -40,7 +41,7 @@ public class GoBoardView extends View  {
     @Override
     protected void onDraw(Canvas canvas) {
         paint=new Paint();
-        drawBoardstate(canvas, 9);
+        drawBoardstate(canvas, 19);
         super.onDraw(canvas);
     }
 
@@ -77,8 +78,14 @@ public class GoBoardView extends View  {
         float width = getWidth();
         float init_height = 0;
         float cell = width/size;
+        float offset = cell/2;
 
-        //Drawing Board
+        drawBoard(size,init_height,cell,canvas);
+        drawGrid(size,init_height,cell,offset, canvas);
+        drawMoves(cell, canvas);
+    }
+
+    private void drawBoard(int size,float init_height,float cell, Canvas canvas){ //Draws Board
         for(int column=0;column<size;column++){ // draws size*size board (standard sizes are 9x9, 13x13, 19x19)
             for(int row=0;row<size;row++){
                 paint.setColor(brown);
@@ -89,18 +96,19 @@ public class GoBoardView extends View  {
                         init_height+cell*(row+1),paint);
             }
         }
+    }
 
-        //Drawing actual grid
+    private void drawGrid(int size,float init_height,float cell, float offset,Canvas canvas){ //Drawing actual grid
         paint.setColor(gray);
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(5);
         for(int column=0;column<size-1;column++){ // draws size-1*size-1 grid (standard sizes are 9x9, 13x13, 19x19)
             for(int row=0;row<size-1;row++){
                 canvas.drawRect(
-                        cell*column+cell/2,
-                        init_height+cell*row+cell/2,
-                        cell*(column+1)+cell/2,
-                        init_height+cell*(row+1)+cell/2,paint);
+                        cell*column+offset,
+                        init_height+cell*row+offset,
+                        cell*(column+1)+offset,
+                        init_height+cell*(row+1)+offset,paint);
             }
         }
 
@@ -110,34 +118,35 @@ public class GoBoardView extends View  {
                 break;
             case 19:
                 for(int i=1; i<6;i=i+2){
-                    canvas.drawCircle(3*i*cell+cell/2,3*cell+cell/2,10,paint);
-                    canvas.drawCircle(3*i*cell+cell/2,9*cell+cell/2,10,paint);
-                    canvas.drawCircle(3*i*cell+cell/2,15*cell+cell/2,10,paint);
+                    canvas.drawCircle(3*i*cell+offset,3*cell+offset,10,paint);
+                    canvas.drawCircle(3*i*cell+offset,9*cell+offset,10,paint);
+                    canvas.drawCircle(3*i*cell+offset,15*cell+offset,10,paint);
                 }
                 break;
             case 13:
                 for(int i=1; i<4;i++){
                     if(i==2){
-                        canvas.drawCircle(3*i*cell+cell/2,6*cell+cell/2,10,paint);
+                        canvas.drawCircle(3*i*cell+offset,6*cell+offset,10,paint);
                     }else{
-                        canvas.drawCircle(3*i*cell+cell/2,3*cell+cell/2,10,paint);
-                        canvas.drawCircle(3*i*cell+cell/2,9*cell+cell/2,10,paint);
+                        canvas.drawCircle(3*i*cell+offset,3*cell+offset,10,paint);
+                        canvas.drawCircle(3*i*cell+offset,9*cell+offset,10,paint);
                     }
                 }
                 break;
             case 9:
                 for(int i=1; i<4;i++){
                     if(i==2){
-                        canvas.drawCircle(2*i*cell+cell/2,4*cell+cell/2,10,paint);
+                        canvas.drawCircle(2*i*cell+offset,4*cell+offset,10,paint);
                     }else{
-                        canvas.drawCircle(2*i*cell+cell/2,2*cell+cell/2,10,paint);
-                        canvas.drawCircle(2*i*cell+cell/2,6*cell+cell/2,10,paint);
+                        canvas.drawCircle(2*i*cell+offset,2*cell+offset,10,paint);
+                        canvas.drawCircle(2*i*cell+offset,6*cell+offset,10,paint);
                     }
                 }
                 break;
         }
+    }
 
-        //drawing stones/moves
+    private void drawMoves(float cell, Canvas canvas){ //draws stones/moves
         //stones snap onto nearest grid intersection
         for(Integer key : moves.keySet()) {
             posX = moves.get(key).get(0);
