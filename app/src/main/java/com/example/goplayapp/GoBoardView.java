@@ -7,6 +7,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -74,7 +75,7 @@ public class GoBoardView extends View  {
     private void drawBoard(Canvas canvas, int size){
         float width = getWidth();
         float height = getHeight();
-        float init_height = height/5;
+        float init_height = 0;
         float cell = width/size;
 
         //Drawing Grid
@@ -90,7 +91,6 @@ public class GoBoardView extends View  {
                         init_height+cell*row,
                         cell*(column+1),
                         init_height+cell*(row+1),paint);
-
             }
         }
 
@@ -109,19 +109,18 @@ public class GoBoardView extends View  {
         }
 
         //drawing stones/moves
-        //(posX/cell +1 = column)
-        //(posY/cell) +1 = row
+        //stones are slightly offset on the y axis, not perfectly in the middle of grid cell
         for(Integer key : moves.keySet()) {
             posX = moves.get(key).get(0);
             posY = moves.get(key).get(1);
-            int move_col = (int) Math.floor(posX/cell);
-            int move_row = (int) Math.floor(posY/cell);
+            float move_col = (float)Math.floor(posX/cell); //posX/cell = column
+            float move_row = (float)Math.floor(posY/cell); //posY/cell = row
 
-            Rect BoardPosition = new Rect(
-                    (int)(cell*move_col),
-                    (int)(cell*move_row),
-                    (int)(cell*(move_col+1)),
-                    (int)(cell*(move_row+1)));
+            RectF BoardPosition = new RectF(
+                    (cell*move_col),
+                    (cell*move_row),
+                    (cell*(move_col+1)),
+                    (cell*(move_row+1)));
             if(key%2 == 0){
                 canvas.drawBitmap(whiteStoneBitmap, null, BoardPosition, paint);
             }else{
