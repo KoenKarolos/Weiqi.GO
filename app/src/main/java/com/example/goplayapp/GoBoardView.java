@@ -109,14 +109,19 @@ public class GoBoardView extends View  {
         }
 
         //drawing stones/moves
+        //(posX/cell +1 = column)
+        //(posY/cell) +1 = row
         for(Integer key : moves.keySet()) {
             posX = moves.get(key).get(0);
             posY = moves.get(key).get(1);
+            int move_col = (int) Math.floor(posX/cell);
+            int move_row = (int) Math.floor(posY/cell);
+
             Rect BoardPosition = new Rect(
-                    (int) (posX - cell / 2),
-                    (int) (posY - cell / 2),
-                    (int) (posX + cell / 2),
-                    (int) (posY + cell / 2));
+                    (int)(cell*move_col),
+                    (int)(cell*move_row),
+                    (int)(cell*(move_col+1)),
+                    (int)(cell*(move_row+1)));
             if(key%2 == 0){
                 canvas.drawBitmap(whiteStoneBitmap, null, BoardPosition, paint);
             }else{
