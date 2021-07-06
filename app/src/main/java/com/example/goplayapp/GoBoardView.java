@@ -29,7 +29,8 @@ public class GoBoardView extends View  {
 
     float posX,posY;
     private int turn = 1;
-    int teal = ContextCompat.getColor(getContext(), R.color.teal_700);
+    int brown = ContextCompat.getColor(getContext(), R.color.brown);
+    int gray = ContextCompat.getColor(getContext(), R.color.darkgray);
     private Paint paint;
     private Bitmap whiteStoneBitmap = BitmapFactory.decodeResource(getContext().getResources() ,R.drawable.white_stone);
     private Bitmap blackStoneBitmap = BitmapFactory.decodeResource(getContext().getResources() ,R.drawable.black_stone);
@@ -39,7 +40,7 @@ public class GoBoardView extends View  {
     @Override
     protected void onDraw(Canvas canvas) {
         paint=new Paint();
-        drawBoard(canvas, 9);
+        drawBoardstate(canvas, 9);
         super.onDraw(canvas);
     }
 
@@ -72,20 +73,15 @@ public class GoBoardView extends View  {
         return true;
     }
 
-    private void drawBoard(Canvas canvas, int size){
+    private void drawBoardstate(Canvas canvas, int size){
         float width = getWidth();
-        float height = getHeight();
         float init_height = 0;
         float cell = width/size;
 
-        //Drawing Grid
-        for(int column=0;column<size;column++){ // draws 9x9 board
+        //Drawing Board
+        for(int column=0;column<size;column++){ // draws size*size board (standard sizes are 9x9, 13x13, 19x19)
             for(int row=0;row<size;row++){
-                if (column%2 == 1 && row%2 == 0 || column%2 == 0 && row%2 ==1){
-                    paint.setColor(teal);
-                }else{
-                    paint.setColor(Color.LTGRAY);
-                }
+                paint.setColor(brown);
                 canvas.drawRect(
                         cell*column,
                         init_height+cell*row,
@@ -94,11 +90,11 @@ public class GoBoardView extends View  {
             }
         }
 
-        //Drawing actual Board
-        paint.setColor(Color.BLACK);
+        //Drawing actual grid
+        paint.setColor(gray);
         paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(10);
-        for(int column=0;column<size-1;column++){ // draws 9x9 board
+        paint.setStrokeWidth(5);
+        for(int column=0;column<size-1;column++){ // draws size-1*size-1 grid (standard sizes are 9x9, 13x13, 19x19)
             for(int row=0;row<size-1;row++){
                 canvas.drawRect(
                         cell*column+cell/2,
@@ -108,19 +104,53 @@ public class GoBoardView extends View  {
             }
         }
 
+        paint.setStyle(Paint.Style.FILL_AND_STROKE);
+        switch(size){
+            default:
+                break;
+            case 19:
+                for(int i=1; i<6;i=i+2){
+                    canvas.drawCircle(3*i*cell+cell/2,3*cell+cell/2,10,paint);
+                    canvas.drawCircle(3*i*cell+cell/2,9*cell+cell/2,10,paint);
+                    canvas.drawCircle(3*i*cell+cell/2,15*cell+cell/2,10,paint);
+                }
+                break;
+            case 13:
+                for(int i=1; i<4;i++){
+                    if(i==2){
+                        canvas.drawCircle(3*i*cell+cell/2,6*cell+cell/2,10,paint);
+                    }else{
+                        canvas.drawCircle(3*i*cell+cell/2,3*cell+cell/2,10,paint);
+                        canvas.drawCircle(3*i*cell+cell/2,9*cell+cell/2,10,paint);
+                    }
+                }
+                break;
+            case 9:
+                for(int i=1; i<4;i++){
+                    if(i==2){
+                        canvas.drawCircle(2*i*cell+cell/2,4*cell+cell/2,10,paint);
+                    }else{
+                        canvas.drawCircle(2*i*cell+cell/2,2*cell+cell/2,10,paint);
+                        canvas.drawCircle(2*i*cell+cell/2,6*cell+cell/2,10,paint);
+                    }
+                }
+                break;
+        }
+
         //drawing stones/moves
-        //stones are slightly offset on the y axis, not perfectly in the middle of grid cell
+        //stones snap onto nearest grid intersection
         for(Integer key : moves.keySet()) {
             posX = moves.get(key).get(0);
             posY = moves.get(key).get(1);
-            float move_col = (float)Math.floor(posX/cell); //posX/cell = column
-            float move_row = (float)Math.floor(posY/cell); //posY/cell = row
+            float move_col = (float)Math.floor(posX/cell);
+            float move_row = (float)Math.floor(posY/cell);
 
             RectF BoardPosition = new RectF(
                     (cell*move_col),
                     (cell*move_row),
                     (cell*(move_col+1)),
                     (cell*(move_row+1)));
+
             if(key%2 == 0){
                 canvas.drawBitmap(whiteStoneBitmap, null, BoardPosition, paint);
             }else{
