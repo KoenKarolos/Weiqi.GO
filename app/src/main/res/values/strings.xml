@@ -16,4 +16,7 @@
     <string name="title_rules">Learn the rules</string>
     <string name="title_online">Play Online!</string>
     <string name="title_local">Play Locally!</string>
+    <string name="title_9x9">9x9</string>
+    <string name="title_13x13">13x13</string>
+    <string name="title_19x19">19x19</string>
 </resources>
