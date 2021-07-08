@@ -4,9 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Rect;
 import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -29,10 +27,11 @@ public class GoBoardView extends View  {
 
     float posX,posY;
     private int turn = 1;
+    int size = 19;
 
+    private Paint paint;
     int brown = ContextCompat.getColor(getContext(), R.color.brown);
     int gray = ContextCompat.getColor(getContext(), R.color.darkgray);
-    private Paint paint;
     private Bitmap whiteStoneBitmap = BitmapFactory.decodeResource(getContext().getResources() ,R.drawable.white_stone);
     private Bitmap blackStoneBitmap = BitmapFactory.decodeResource(getContext().getResources() ,R.drawable.black_stone);
 
@@ -41,7 +40,7 @@ public class GoBoardView extends View  {
     @Override
     protected void onDraw(Canvas canvas) {
         paint=new Paint();
-        drawBoardstate(canvas, 19);
+        drawBoardstate(canvas, size);
         super.onDraw(canvas);
     }
 
@@ -53,11 +52,6 @@ public class GoBoardView extends View  {
 
         switch (event.getAction()){
             case MotionEvent.ACTION_UP:
-                if(turn%2 == 0){
-                    Log.d(TAG,"Turn Nr. " + turn + ": WHITE moved to x= " + posX +" y= "+ posY);
-                }else{
-                    Log.d(TAG,"Turn Nr. " + turn + ": BLACK moved to x= " + posX +" y= "+ posY);
-                }
                 k.add((int) posX);
                 k.add((int) posY);
                 moves.put(turn,k);
@@ -76,29 +70,29 @@ public class GoBoardView extends View  {
 
     private void drawBoardstate(Canvas canvas, int size){
         float width = getWidth();
-        float init_height = 0;
         float cell = width/size;
         float offset = cell/2;
 
-        drawBoard(size,init_height,cell,canvas);
-        drawGrid(size,init_height,cell,offset, canvas);
+        drawBoard(size,cell,canvas);
+        drawGrid(size,cell,offset, canvas);
         drawMoves(cell, canvas);
     }
 
-    private void drawBoard(int size,float init_height,float cell, Canvas canvas){ //Draws Board
+    private void drawBoard(int size,float cell, Canvas canvas){ //Draws Board
         for(int column=0;column<size;column++){ // draws size*size board (standard sizes are 9x9, 13x13, 19x19)
             for(int row=0;row<size;row++){
                 paint.setColor(brown);
                 canvas.drawRect(
                         cell*column,
-                        init_height+cell*row,
+                        cell*row,
                         cell*(column+1),
-                        init_height+cell*(row+1),paint);
+                        cell*(row+1),
+                        paint);
             }
         }
     }
 
-    private void drawGrid(int size,float init_height,float cell, float offset,Canvas canvas){ //Drawing actual grid
+    private void drawGrid(int size,float cell, float offset,Canvas canvas){ //Drawing actual grid
         paint.setColor(gray);
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(5);
@@ -106,9 +100,10 @@ public class GoBoardView extends View  {
             for(int row=0;row<size-1;row++){
                 canvas.drawRect(
                         cell*column+offset,
-                        init_height+cell*row+offset,
+                        cell*row+offset,
                         cell*(column+1)+offset,
-                        init_height+cell*(row+1)+offset,paint);
+                        cell*(row+1)+offset,
+                        paint);
             }
         }
 
