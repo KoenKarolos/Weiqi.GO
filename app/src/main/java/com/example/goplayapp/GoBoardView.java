@@ -14,8 +14,6 @@ import android.view.View;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
-import com.example.goplayapp.ui.GameLogic;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -45,7 +43,7 @@ public class GoBoardView extends View {
     }
 
     public void init(){
-        String[][] boardState = gameLogic.initBoard(size);
+        Character[][] boardState = gameLogic.initBoard(size);
         gameLogic.printBoard(boardState);
     }
 

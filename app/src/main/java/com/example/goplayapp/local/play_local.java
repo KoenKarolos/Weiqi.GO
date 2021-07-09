@@ -8,7 +8,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.goplayapp.GoBoardView;
 import com.example.goplayapp.R;
-import com.example.goplayapp.ui.GameLogic;
+import com.example.goplayapp.GameLogic;
 
 public class play_local extends AppCompatActivity implements GameLogic {
     private static final String TAG = "Weiqi:";
@@ -19,33 +19,40 @@ public class play_local extends AppCompatActivity implements GameLogic {
 
         GoBoardView boardView = new GoBoardView(getBaseContext(),null);
         boardView.setOnGameLogic(this);
-        boardView.init();
+
         setContentView(R.layout.activity_local);
+        boardView.init();
     }
 
     @Override
-    public String[][] initBoard(int size){
-        String[][] boardState = new String[size][size];
-        for(int i=0;i<size;i++){
-            for(int j=0;j<size;j++) {
-                boardState[i][j] = "*";
+    public Character[][] initBoard(int size){
+        Character[][] boardState = new Character[size][size];
+        for(int row=0;row<size;row++){
+            for(int col=0;col<size;col++) {
+                boardState[row][col] = '*';
             }
         }
         return boardState;
     }
 
     @Override
-    public void printBoard(String[][] boardState){
+    public void printBoard(Character[][] boardState){
         StringBuilder row = new StringBuilder();
         String board = "Boardstate \n";
-        for (String[] rows : boardState) {
-            for (String column : rows) {
-                row.append("*").append(" ");
+        for (Character[] rows : boardState) {
+            for (Character cell : rows) {
+                row.append(cell).append("  ");
             }
             board += row + "\n";
             row = new StringBuilder();
         }
         Log.i(TAG, board);
+    }
+
+    @Override
+    public Character[][] updateBoard(Character[][] boardState, int row, int col, char player){
+            boardState[row][col] = player;
+        return boardState;
     }
 
 }
