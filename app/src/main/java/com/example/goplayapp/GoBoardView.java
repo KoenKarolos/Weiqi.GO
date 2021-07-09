@@ -14,6 +14,8 @@ import android.view.View;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
+import com.example.goplayapp.ui.GameLogic;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,13 +23,13 @@ import java.util.Map;
 
 import static android.content.ContentValues.TAG;
 
-public class GoBoardView extends View  {
+public class GoBoardView extends View {
 
     Map<Integer, List<Integer>> moves = new HashMap<>(); // Dictionary {turn : [posX,posY]}
 
     float posX,posY;
     private int turn = 1;
-    int size = 19;
+    int size = 9;
 
     private Paint paint;
     int brown = ContextCompat.getColor(getContext(), R.color.brown);
@@ -36,6 +38,16 @@ public class GoBoardView extends View  {
     private Bitmap blackStoneBitmap = BitmapFactory.decodeResource(getContext().getResources() ,R.drawable.black_stone);
 
     public GoBoardView(Context context, @Nullable AttributeSet attrs) { super(context,attrs);}
+
+    private GameLogic gameLogic; //setter of interface GameLogic
+    public void setOnGameLogic(GameLogic gameLogic){
+        this.gameLogic = gameLogic;
+    }
+
+    public void init(){
+        String[][] boardState = gameLogic.initBoard(size);
+        gameLogic.printBoard(boardState);
+    }
 
     @Override
     protected void onDraw(Canvas canvas) {
