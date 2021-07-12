@@ -38,13 +38,18 @@ public class GoBoardView extends View {
 
     public GoBoardView(Context context, @Nullable AttributeSet attrs) { super(context,attrs);}
 
-    private GameLogic gameLogic; //setter of interface GameLogic
-    public void setOnGameLogic(GameLogic gameLogic){
-        this.gameLogic = gameLogic;
+    public void init(){
+        initBoard(size);
     }
 
-    public void init(){
-        gameLogic.initBoard(size);
+    public void initBoard(int size){
+        Character[][] boardState = new Character[size][size];
+        for(int row=0;row<size;row++){
+            for(int col=0;col<size;col++) {
+                boardState[row][col] = '*';
+            }
+        }
+        MySingletonClass.getInstance().setValue(boardState);
     }
 
     public void printBoard(Character[][] boardState){
@@ -71,23 +76,28 @@ public class GoBoardView extends View {
     public boolean onTouchEvent(MotionEvent event) {
         posX=event.getX();
         posY=event.getY();
-        List<Integer> k = new ArrayList<>();
+
+        Character[][] boardstate = MySingletonClass.getInstance().getValue();
+        float cell_size=(getWidth()/size);
+        int move_col = (int) Math.floor(posX/ cell_size);
+        int move_row = (int) Math.floor(posY/cell_size);
+        List<Integer> coordinates = new ArrayList<>();
 
         switch (event.getAction()){
             case MotionEvent.ACTION_UP:
-                k.add((int) posX);
-                k.add((int) posY);
-                moves.put(turn,k);
-                Log.d(TAG, String.valueOf(moves.keySet()));
-                turn += 1;
+                if (boardstate[move_row][move_col] == '*'){
+                    coordinates.add(move_col);
+                    coordinates.add(move_row);
+                    moves.put(turn,coordinates);
+                    turn += 1;
+                    invalidate(); //redraws canvas
+                }
                 break;
 
             case MotionEvent.ACTION_DOWN:
                 //to do ghost move
                 break;
         }
-        invalidate(); //redraws canvas
-
         return true;
     }
 
@@ -168,26 +178,28 @@ public class GoBoardView extends View {
         //stones snap onto nearest grid intersection
         Character[][] boardstate = MySingletonClass.getInstance().getValue();
         for(Integer key : moves.keySet()) {
-            posX = moves.get(key).get(0);
-            posY = moves.get(key).get(1);
-            float move_col = (float)Math.floor(posX/cell);
-            float move_row = (float)Math.floor(posY/cell);
+            try {
+                int move_col = moves.get(key).get(0);
+                int move_row = moves.get(key).get(1);
 
-            RectF BoardPosition = new RectF(
-                    (cell*move_col),
-                    (cell*move_row),
-                    (cell*(move_col+1)),
-                    (cell*(move_row+1)));
+                RectF BoardPosition = new RectF(
+                        (cell*move_col),
+                        (cell*move_row),
+                        (cell*(move_col+1)),
+                        (cell*(move_row+1)));
 
-            if(key%2 == 0){
-                canvas.drawBitmap(whiteStoneBitmap, null, BoardPosition, paint);
-                boardstate[(int)move_row][(int)move_col] = 'w';
-            }else{
-                canvas.drawBitmap(blackStoneBitmap, null, BoardPosition, paint);
-                boardstate[(int)move_row][(int)move_col] = 'b';
+                if(key%2 == 0){
+                    canvas.drawBitmap(whiteStoneBitmap, null, BoardPosition, paint);
+                    boardstate[move_row][move_col] = 'w';
+                }else{
+                    canvas.drawBitmap(blackStoneBitmap, null, BoardPosition, paint);
+                    boardstate[move_row][move_col] = 'b';
+                }
+            }catch (Exception e) {
+                System.out.println("Cursor out of bounds!");
             }
-            MySingletonClass.getInstance().setValue(boardstate);
-            printBoard(boardstate);
         }
+        MySingletonClass.getInstance().setValue(boardstate);
+        printBoard(boardstate);
     }
 }
