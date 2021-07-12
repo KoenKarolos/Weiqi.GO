@@ -7,6 +7,7 @@ import android.util.Log;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.goplayapp.GoBoardView;
+import com.example.goplayapp.MySingletonClass;
 import com.example.goplayapp.R;
 import com.example.goplayapp.GameLogic;
 
@@ -32,6 +33,7 @@ public class play_local extends AppCompatActivity implements GameLogic {
                 boardState[row][col] = '*';
             }
         }
+        MySingletonClass.getInstance().setValue(boardState);
         return boardState;
     }
 
@@ -54,6 +56,5 @@ public class play_local extends AppCompatActivity implements GameLogic {
             boardState[row][col] = player;
         return boardState;
     }
-
 }
 

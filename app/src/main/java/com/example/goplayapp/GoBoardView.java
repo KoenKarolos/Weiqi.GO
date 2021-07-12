@@ -35,6 +35,7 @@ public class GoBoardView extends View {
     private Bitmap whiteStoneBitmap = BitmapFactory.decodeResource(getContext().getResources() ,R.drawable.white_stone);
     private Bitmap blackStoneBitmap = BitmapFactory.decodeResource(getContext().getResources() ,R.drawable.black_stone);
 
+
     public GoBoardView(Context context, @Nullable AttributeSet attrs) { super(context,attrs);}
 
     private GameLogic gameLogic; //setter of interface GameLogic
@@ -59,6 +60,7 @@ public class GoBoardView extends View {
         posX=event.getX();
         posY=event.getY();
         List<Integer> k = new ArrayList<>();
+        Character[][] boardstate = MySingletonClass.getInstance().getValue();
 
         switch (event.getAction()){
             case MotionEvent.ACTION_UP:
@@ -67,6 +69,8 @@ public class GoBoardView extends View {
                 moves.put(turn,k);
                 Log.d(TAG, String.valueOf(moves.keySet()));
                 turn += 1;
+                boardstate[1][1]='b';
+                Log.i(TAG, String.valueOf(boardstate[1][1]));
                 break;
 
             case MotionEvent.ACTION_DOWN:
