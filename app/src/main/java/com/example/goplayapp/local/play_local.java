@@ -36,25 +36,5 @@ public class play_local extends AppCompatActivity implements GameLogic {
         MySingletonClass.getInstance().setValue(boardState);
         return boardState;
     }
-
-    @Override
-    public void printBoard(Character[][] boardState){
-        StringBuilder row = new StringBuilder();
-        String board = "Boardstate \n";
-        for (Character[] rows : boardState) {
-            for (Character cell : rows) {
-                row.append(cell).append("  ");
-            }
-            board += row + "\n";
-            row = new StringBuilder();
-        }
-        Log.i(TAG, board);
-    }
-
-    @Override
-    public Character[][] updateBoard(Character[][] boardState, int row, int col, char player){
-            boardState[row][col] = player;
-        return boardState;
-    }
 }
 

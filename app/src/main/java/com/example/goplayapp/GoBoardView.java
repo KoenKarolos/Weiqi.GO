@@ -44,8 +44,20 @@ public class GoBoardView extends View {
     }
 
     public void init(){
-        Character[][] boardState = gameLogic.initBoard(size);
-        gameLogic.printBoard(boardState);
+        gameLogic.initBoard(size);
+    }
+
+    public void printBoard(Character[][] boardState){
+        StringBuilder row = new StringBuilder();
+        String board = "Boardstate \n";
+        for (Character[] rows : boardState) {
+            for (Character cell : rows) {
+                row.append(cell).append("  ");
+            }
+            board += row + "\n";
+            row = new StringBuilder();
+        }
+        Log.i(TAG, board);
     }
 
     @Override
@@ -60,7 +72,6 @@ public class GoBoardView extends View {
         posX=event.getX();
         posY=event.getY();
         List<Integer> k = new ArrayList<>();
-        Character[][] boardstate = MySingletonClass.getInstance().getValue();
 
         switch (event.getAction()){
             case MotionEvent.ACTION_UP:
@@ -69,8 +80,6 @@ public class GoBoardView extends View {
                 moves.put(turn,k);
                 Log.d(TAG, String.valueOf(moves.keySet()));
                 turn += 1;
-                boardstate[1][1]='b';
-                Log.i(TAG, String.valueOf(boardstate[1][1]));
                 break;
 
             case MotionEvent.ACTION_DOWN:
@@ -157,6 +166,7 @@ public class GoBoardView extends View {
 
     private void drawMoves(float cell, Canvas canvas){ //draws stones/moves
         //stones snap onto nearest grid intersection
+        Character[][] boardstate = MySingletonClass.getInstance().getValue();
         for(Integer key : moves.keySet()) {
             posX = moves.get(key).get(0);
             posY = moves.get(key).get(1);
@@ -171,9 +181,13 @@ public class GoBoardView extends View {
 
             if(key%2 == 0){
                 canvas.drawBitmap(whiteStoneBitmap, null, BoardPosition, paint);
+                boardstate[(int)move_row][(int)move_col] = 'w';
             }else{
                 canvas.drawBitmap(blackStoneBitmap, null, BoardPosition, paint);
+                boardstate[(int)move_row][(int)move_col] = 'b';
             }
+            MySingletonClass.getInstance().setValue(boardstate);
+            printBoard(boardstate);
         }
     }
 }
