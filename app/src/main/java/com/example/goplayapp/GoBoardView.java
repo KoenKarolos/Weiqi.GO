@@ -24,7 +24,6 @@ public class GoBoardView extends View {
 
     float posX,posY;
     private int turn = 1;
-    int size = BoardStateClass.getInstance().getSize();
 
     private Paint paint;
     int brown = ContextCompat.getColor(getContext(), R.color.brown);
@@ -40,6 +39,7 @@ public class GoBoardView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
+        int size = BoardStateClass.getInstance().getSize();
         paint=new Paint();
         drawBoardstate(canvas, size);
         super.onDraw(canvas);
@@ -47,6 +47,7 @@ public class GoBoardView extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        int size = BoardStateClass.getInstance().getSize();
         posX=event.getX();
         posY=event.getY();
 
