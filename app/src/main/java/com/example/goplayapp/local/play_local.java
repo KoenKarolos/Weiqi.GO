@@ -14,9 +14,8 @@ public class play_local extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         GoBoardView boardView = new GoBoardView(getBaseContext(),null);
-        BoardStateClass.getInstance().setSize(9);
         setContentView(R.layout.activity_local);
-        boardView.init();
+        boardView.init(9);
     }
 }
 

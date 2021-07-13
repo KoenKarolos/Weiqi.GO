@@ -6,7 +6,9 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.nfc.Tag;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import androidx.annotation.Nullable;
@@ -25,7 +27,9 @@ public class GoBoardView extends View {
 
     public GoBoardView(Context context, @Nullable AttributeSet attrs) { super(context,attrs);}
 
-    public void init(){ //get's called onCreate and initiates a BoardInstance
+    public void init(int size){ //get's called onCreate and initiates a BoardInstance
+        BoardStateClass.getInstance().wipeBoard();
+        BoardStateClass.getInstance().setSize(size);
         BoardStateClass.getInstance().initBoard();
     }
 
@@ -47,11 +51,17 @@ public class GoBoardView extends View {
         int move_col = (int) Math.floor(posX/ cell_size);
         int move_row = (int) Math.floor(posY/cell_size);
 
+        if (move_col > size-1 || move_row > size-1 || move_col < 0 || move_row <0){
+            Log.d("Weiqi", "Cursor out of bounds!");
+            return false;
+        }
+
         Character[][] boardState = BoardStateClass.getInstance().getBoard();
 
-        switch (event.getAction()){
+        switch (event.getAction()) {
             case MotionEvent.ACTION_UP:
-                if (boardState[move_row][move_col] == '*' ){
+
+                if (boardState[move_row][move_col] == '*') {
 
                     MoveHandler.getInstance().addMove(move_col, move_row);
                     invalidate(); //redraws canvas
@@ -166,7 +176,11 @@ public class GoBoardView extends View {
                 System.out.println("Cursor out of bounds!");
             }
         }
-        BoardStateClass.getInstance().setBoard(boardState);
-        BoardStateClass.getInstance().printValue();
+        new Thread(new Runnable(){
+            public void run(){
+                BoardStateClass.getInstance().setBoard(boardState);
+                BoardStateClass.getInstance().printValue();
+            }
+        }).start();
     }
 }
