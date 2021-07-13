@@ -7,7 +7,6 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -19,15 +18,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static android.content.ContentValues.TAG;
-
 public class GoBoardView extends View {
 
     Map<Integer, List<Integer>> moves = new HashMap<>(); // Dictionary {turn : [posX,posY]}
 
     float posX,posY;
     private int turn = 1;
-    int size = 9;
+    int size = BoardStateClass.getInstance().getSize();
 
     private Paint paint;
     int brown = ContextCompat.getColor(getContext(), R.color.brown);
@@ -35,34 +32,10 @@ public class GoBoardView extends View {
     private Bitmap whiteStoneBitmap = BitmapFactory.decodeResource(getContext().getResources() ,R.drawable.white_stone);
     private Bitmap blackStoneBitmap = BitmapFactory.decodeResource(getContext().getResources() ,R.drawable.black_stone);
 
-
     public GoBoardView(Context context, @Nullable AttributeSet attrs) { super(context,attrs);}
 
-    public void init(){
-        initBoard(size);
-    }
-
-    public void initBoard(int size){
-        Character[][] boardState = new Character[size][size];
-        for(int row=0;row<size;row++){
-            for(int col=0;col<size;col++) {
-                boardState[row][col] = '*';
-            }
-        }
-        MySingletonClass.getInstance().setValue(boardState);
-    }
-
-    public void printBoard(Character[][] boardState){
-        StringBuilder row = new StringBuilder();
-        String board = "Boardstate \n";
-        for (Character[] rows : boardState) {
-            for (Character cell : rows) {
-                row.append(cell).append("  ");
-            }
-            board += row + "\n";
-            row = new StringBuilder();
-        }
-        Log.i(TAG, board);
+    public void init(){ //get's called onCreate and initiates a BoardInstance
+        BoardStateClass.getInstance().initBoard();
     }
 
     @Override
@@ -77,15 +50,16 @@ public class GoBoardView extends View {
         posX=event.getX();
         posY=event.getY();
 
-        Character[][] boardstate = MySingletonClass.getInstance().getValue();
         float cell_size=(getWidth()/size);
         int move_col = (int) Math.floor(posX/ cell_size);
         int move_row = (int) Math.floor(posY/cell_size);
+
         List<Integer> coordinates = new ArrayList<>();
+        Character[][] boardState = BoardStateClass.getInstance().getBoard();
 
         switch (event.getAction()){
             case MotionEvent.ACTION_UP:
-                if (boardstate[move_row][move_col] == '*'){
+                if (boardState[move_row][move_col] == '*' ){
                     coordinates.add(move_col);
                     coordinates.add(move_row);
                     moves.put(turn,coordinates);
@@ -125,7 +99,7 @@ public class GoBoardView extends View {
         }
     }
 
-    private void drawGrid(int size,float cell, float offset,Canvas canvas){ //Drawing actual grid
+    private void drawGrid(int size,float cell, float offset,Canvas canvas){ //Drawing grid
         paint.setColor(gray);
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(5);
@@ -176,7 +150,7 @@ public class GoBoardView extends View {
 
     private void drawMoves(float cell, Canvas canvas){ //draws stones/moves
         //stones snap onto nearest grid intersection
-        Character[][] boardstate = MySingletonClass.getInstance().getValue();
+        Character[][] boardState = BoardStateClass.getInstance().getBoard();
         for(Integer key : moves.keySet()) {
             try {
                 int move_col = moves.get(key).get(0);
@@ -190,16 +164,16 @@ public class GoBoardView extends View {
 
                 if(key%2 == 0){
                     canvas.drawBitmap(whiteStoneBitmap, null, BoardPosition, paint);
-                    boardstate[move_row][move_col] = 'w';
+                    boardState[move_row][move_col] = 'w';
                 }else{
                     canvas.drawBitmap(blackStoneBitmap, null, BoardPosition, paint);
-                    boardstate[move_row][move_col] = 'b';
+                    boardState[move_row][move_col] = 'b';
                 }
             }catch (Exception e) {
                 System.out.println("Cursor out of bounds!");
             }
         }
-        MySingletonClass.getInstance().setValue(boardstate);
-        printBoard(boardstate);
+        BoardStateClass.getInstance().setBoard(boardState);
+        BoardStateClass.getInstance().printValue();
     }
 }
