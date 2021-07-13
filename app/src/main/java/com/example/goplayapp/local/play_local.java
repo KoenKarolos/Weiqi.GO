@@ -17,7 +17,6 @@ public class play_local extends AppCompatActivity {
         BoardStateClass.getInstance().setSize(9);
         setContentView(R.layout.activity_local);
         boardView.init();
-
     }
 }
 

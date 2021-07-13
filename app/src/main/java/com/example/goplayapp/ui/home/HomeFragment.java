@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.goplayapp.BoardStateClass;
 import com.example.goplayapp.R;
 import com.example.goplayapp.local.play_local;
 import com.example.goplayapp.online.play_online;

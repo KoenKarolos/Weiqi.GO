@@ -21,8 +21,8 @@ public class BoardStateClass {
     private Character[][] boardState;
     private Integer size = 19;
 
-    public void setBoard(Character[][] value) {
-        this.boardState = value;
+    public void setBoard(Character[][] board) {
+        this.boardState = board;
     }
     public Character[][] getBoard() { return boardState; }
 
@@ -51,6 +51,11 @@ public class BoardStateClass {
             row = new StringBuilder();
         }
         Log.i(TAG, board);
+    }
+
+    public void wipeBoard(){
+        this.instance = null;
+        MoveHandler.getInstance().wipeMoves();
     }
 
 

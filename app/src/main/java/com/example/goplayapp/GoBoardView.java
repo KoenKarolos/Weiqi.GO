@@ -9,21 +9,13 @@ import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
-
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class GoBoardView extends View {
-
-    Map<Integer, List<Integer>> moves = new HashMap<>(); // Dictionary {turn : [posX,posY]}
-
-    float posX,posY;
-    private int turn = 1;
 
     private Paint paint;
     int brown = ContextCompat.getColor(getContext(), R.color.brown);
@@ -48,23 +40,20 @@ public class GoBoardView extends View {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         int size = BoardStateClass.getInstance().getSize();
-        posX=event.getX();
-        posY=event.getY();
+        float posX=event.getX();
+        float posY=event.getY();
 
         float cell_size=(getWidth()/size);
         int move_col = (int) Math.floor(posX/ cell_size);
         int move_row = (int) Math.floor(posY/cell_size);
 
-        List<Integer> coordinates = new ArrayList<>();
         Character[][] boardState = BoardStateClass.getInstance().getBoard();
 
         switch (event.getAction()){
             case MotionEvent.ACTION_UP:
                 if (boardState[move_row][move_col] == '*' ){
-                    coordinates.add(move_col);
-                    coordinates.add(move_row);
-                    moves.put(turn,coordinates);
-                    turn += 1;
+
+                    MoveHandler.getInstance().addMove(move_col, move_row);
                     invalidate(); //redraws canvas
                 }
                 break;
@@ -152,6 +141,8 @@ public class GoBoardView extends View {
     private void drawMoves(float cell, Canvas canvas){ //draws stones/moves
         //stones snap onto nearest grid intersection
         Character[][] boardState = BoardStateClass.getInstance().getBoard();
+        Map<Integer,List<Integer>>  moves = MoveHandler.getInstance().getMoves();
+
         for(Integer key : moves.keySet()) {
             try {
                 int move_col = moves.get(key).get(0);
@@ -161,7 +152,8 @@ public class GoBoardView extends View {
                         (cell*move_col),
                         (cell*move_row),
                         (cell*(move_col+1)),
-                        (cell*(move_row+1)));
+                        (cell*(move_row+1))
+                );
 
                 if(key%2 == 0){
                     canvas.drawBitmap(whiteStoneBitmap, null, BoardPosition, paint);
