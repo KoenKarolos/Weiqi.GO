@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.media.MediaPlayer;
 import android.nfc.Tag;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -24,7 +25,7 @@ public class GoBoardView extends View {
     int gray = ContextCompat.getColor(getContext(), R.color.darkgray);
     private Bitmap whiteStoneBitmap = BitmapFactory.decodeResource(getContext().getResources() ,R.drawable.white_stone);
     private Bitmap blackStoneBitmap = BitmapFactory.decodeResource(getContext().getResources() ,R.drawable.black_stone);
-
+    private MediaPlayer gopiece = MediaPlayer.create(getContext(), R.raw.gomedium2);
     public GoBoardView(Context context, @Nullable AttributeSet attrs) { super(context,attrs);}
 
     public void init(int size){ //get's called onCreate and initiates a BoardInstance
@@ -51,20 +52,18 @@ public class GoBoardView extends View {
         int move_col = (int) Math.floor(posX/ cell_size);
         int move_row = (int) Math.floor(posY/cell_size);
 
-        if (move_col > size-1 || move_row > size-1 || move_col < 0 || move_row <0){
+        if (cursorOutOfBounds(move_col, move_row, size)){
             Log.d("Weiqi", "Cursor out of bounds!");
             return false;
         }
 
-        Character[][] boardState = BoardStateClass.getInstance().getBoard();
-
         switch (event.getAction()) {
             case MotionEvent.ACTION_UP:
-
-                if (boardState[move_row][move_col] == '*') {
-
+                if (applyRules(move_col, move_row)) {
                     MoveHandler.getInstance().addMove(move_col, move_row);
-                    invalidate(); //redraws canvas
+
+                    gopiece.start();//sound is too slow to play, need to fix
+                    invalidate();
                 }
                 break;
 
@@ -183,4 +182,19 @@ public class GoBoardView extends View {
             }
         }).start();
     }
+
+    public boolean applyRules(int move_col, int move_row){
+        Character[][] boardState = BoardStateClass.getInstance().getBoard();
+        if(boardState[move_row][move_col] == '*'){
+            return true;
+        }
+        return false;
+    }
+    public boolean cursorOutOfBounds(int move_col, int move_row, int size){
+        if(move_col > size-1 || move_row > size-1 || move_col < 0 || move_row <0){
+            return true;
+        }
+        return false;
+    }
+
 }
